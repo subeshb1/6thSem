@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto');
+        * {
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+
+        }
+
+
+        .masthead {
+            background-color: black;
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: -1;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        form {
+            display: flex;
+            padding: 10px;
+            position: relative;
+            top: 20vh;
+            max-width: 600px;
+            margin: 0 auto;
+            background: transparent;
+            color: white;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        button {
+            align-self: flex-start;
+            padding: 10px 1.3em;
+            border-radius: 4px;
+            border: 2px solid #4b77d5;
+            color: white;
+            background: transparent;
+            outline: none;
+        }
+
+        button:hover,
+        button:focus {
+            background: #0d69ad;
+        }
+
+        button:active {
+            box-shadow: 0 0 0 4px #307bcaa3;
+        }
+
+        input {
+            padding: 10px 5px;
+            font-size: 1em;
+            border: 0;
+            background: transparent;
+            border-bottom: 2px solid white;
+            outline: none;
+            color: white;
+
+
+        }
+
+        input:focus {
+            border-bottom-color: #94ceff;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        ::placeholder {
+            color: white;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="masthead">
+        <svg>
+            <circle cx="10" cy="10" r="2" fill="white"></circle>
+        </svg>
+    </div>
+    <div>
+        <form action="#">
+            <h1>Login</h1>
+            <label>
+                Email
+                <input type="email" placeholder='Please enter your Email'>
+            </label>
+            <label>
+                Password
+                <input type="password" placeholder='Pleasr Enter your Password'>
+            </label>
+            <button>Login</button>
+        </form>
+    </div>
+
+    <script>
+        window.onload = () => {
+            const svg = document.querySelector('svg');
+            let width1 = window.innerWidth;
+            let height1 = window.innerHeight;
+            let data = new Array(100).fill(1).map(() => [Math.floor(Math.random() * width1), Math.floor(Math.random() * height1)]);
+            let i = 0;
+            const animate = () => {
+                let width = window.innerWidth;
+                let height = window.innerHeight;
+                if (width !== width1 || height !== height1) {
+                    width1 = width;
+                    height1 = height;
+                    data = new Array(100).fill(1).map(() => [Math.floor(Math.random() * width1), Math.floor(Math.random() * height1)]);
+                }
+                data = data.map(([x, y]) => [(x + Math.random() * 8 - 4) % width, y + (Math.random() * 8 - 4) % height])
+
+                let temp = "";
+
+                temp += data.map(([x, y]) =>
+                    `<circle cx="${x}" cy="${y}" r="1" fill="white"></circle>`
+                ).join("");
+                svg.innerHTML = temp;
+                setTimeout(() => window.requestAnimationFrame(animate), 1000 / 40)
+
+            }
+            window.requestAnimationFrame(animate);
+        }
+
+    </script>
+</body>
+
+</html>
