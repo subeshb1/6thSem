@@ -61,15 +61,21 @@ class NFA
         for (unsigned int i = 0; i < length; i++)
         {
             auto alphabet = getAlphabet(str.at(i));
-            std::vector<FAState *>::size_type size = current.size();
-            for (std::vector<FAState *>::size_type i = 0; i < size; ++i)
+            std::vector<FAState *> next = {};
+            for (auto state : current)
             {
-                auto transTo = current[i]->transitions[alphabet][0];
+                auto transStates = state->transitions[alphabet];
+                for (auto state : transStates)
+                    if (std::find(next.begin(), next.end(), state) == next.end())
+                        next.push_back(state);
             }
-            // std::find(vector.begin(), vector.end(), item) != vector.end()
+            current = next;
         }
-
-        return current->isFinal;
+        if (std::find_if(current.begin(), current.end(), [](FAState *state) {
+                return state->isFinal;
+            }) != current.end())
+            return true;
+        return false;
     }
 
   private:
@@ -101,9 +107,9 @@ int main(int argc, char const *argv[])
     std::chrono::duration<double> diff = end - start;
     std::cout << "Time to Load "
               << " ints : " << diff.count() << " s\n";
-    DFA a(q0);
+    NFA a(q0);
     start = std::chrono::system_clock::now();
-    std::cout << (a.test(test, getAlphabet) ? "true" : "false") << std::endl;
+    std::cout << (a.test("a", getAlphabet) ? "true" : "false") << std::endl;
     end = std::chrono::system_clock::now();
     diff = end - start;
     std::cout << "Time to Test "
