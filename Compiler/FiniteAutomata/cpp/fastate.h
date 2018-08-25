@@ -13,7 +13,7 @@ struct FAState
     {
         isFinal = false;
     }
-    FAState(auto name, auto transitions, auto isFinal = false)
+    FAState(std::string name, std::vector<std::vector<FAState *>> transitions, bool isFinal = false)
     {
         this->name = name;
         this->isFinal = isFinal;

@@ -2,7 +2,8 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-
+#include <chrono>
+#include <fstream>
 struct Tuples
 {
     std::vector<std::string> states;
@@ -70,9 +71,26 @@ int main(int argc, char const *argv[])
                }},
     };
     a.startState = "q1";
-    auto dfa = DFA(a);
-    
-    dfa.test("");
+    std::ifstream file(argv[1]);
+    std::string test;
+    auto start = std::chrono::system_clock::now();
+    getline(file, test);
+    auto end = std::chrono::system_clock::now();
+    auto length = test.length();
+    std::cout << "Length: " << length << std::endl;
+    std::chrono::duration<double> diff = end - start;
+    std::cout << "Time to Load "
+              << " ints : " << diff.count() << " s\n";
+
+    // ENFA a(q0);
+
+    start = std::chrono::system_clock::now();
+    DFA dfa(a);
+    std::cout << (dfa.test(test) ? "true" : "false") << std::endl;
+    end = std::chrono::system_clock::now();
+    diff = end - start;
+    std::cout << "Time to Test "
+              << " ints : " << diff.count() << " s\n";
 
     return 0;
 }
