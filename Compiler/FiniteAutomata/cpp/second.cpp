@@ -13,131 +13,47 @@
 #include "enfa.h"
 #include "enfatodfa.h"
 #include <set>
-#include <emscripten/emscripten.h>
+#include "re_to_postfix.h"
+#include "postfix_re_to_enfa.h"
+// #include <emscripten/emscripten.h>
 
 int main(int argc, char const *argv[])
 {
+    if (argc > 1)
+    {
+        std::string regex = argv[1];
+        std::string test;
+        if (argc == 4)
+        {
+            std::ifstream file(argv[3]);
+            getline(file, test);
+        }
+        else
+        {
+            test = argv[2];
+        }
+        auto call = [regex, test]() {
+                        auto pregex = reToPostfix(regex);
+            std::cout << pregex.first << std::endl;
+            std::cout << pregex.second.size() << std::endl;
+            auto startState = postfixToEnfa(pregex);
+            auto alphabetSet = pregex.second;
 
-    // std::ifstream file(argv[1]);
-    std::ifstream file("test.cpp");
-    auto getAlphabet = [](int a) {
-        if (a == 97)
-            return 0;
-        return 1;
-    };
+            auto getAlphabet = [&](int a) {
+                int j = 0;
+                for (auto i = alphabetSet.begin(); i != alphabetSet.end(); ++i, ++j)
+                {
+                    if (a == *i)
+                        return j;
+                }
+                return -1;
+            };
+            EnfaToDfa b(startState.first);
+            DFA a(b.toDfa(alphabetSet.size()));
 
-    auto q0 = new FAState();
-    auto q1 = new FAState();
-    auto q2 = new FAState();
-    auto q3 = new FAState();
-    auto q4 = new FAState();
-    auto q5 = new FAState();
-    auto q6 = new FAState();
-    auto q7 = new FAState();
-    auto q8 = new FAState();
-    auto q9 = new FAState();
-    auto q10 = new FAState();
-
-    q0->transitions = {
-        {q1, q7}, {}, {}};
-    q1->transitions = {
-        {q2, q4}, {}, {}};
-    q2->transitions = {
-        {}, {q3}, {}};
-    q3->transitions = {
-        {q6}, {}, {}};
-    q4->transitions = {
-        {}, {}, {q5}};
-    q5->transitions = {
-        {q6}, {}, {}};
-    q6->transitions = {
-        {q1, q7}, {}, {}};
-    q7->transitions = {
-        {}, {q8}, {}};
-    q8->transitions = {
-        {}, {}, {q9}};
-    q9->transitions = {
-        {}, {}, {q10}};
-    q10->transitions = {
-        {}, {}, {}};
-    q10->isFinal = true;
-
-    EnfaToDfa conv(q0);
-
-    std::string test;
-
-    auto start = std::chrono::system_clock::now();
-    getline(file, test);
-    auto end = std::chrono::system_clock::now();
-    auto length = test.length();
-    std::cout << "Length: " << length << std::endl;
-    std::chrono::duration<double> diff = end - start;
-    std::cout << "Time to Load "
-              << " ints : " << diff.count() << " s\n";
-
-    // ENFA a(q0);
-
-    start = std::chrono::system_clock::now();
-    DFA a(conv.toDfa(2));
-    std::cout << (a.test(test, getAlphabet) ? "true" : "false") << std::endl;
-    end = std::chrono::system_clock::now();
-    diff = end - start;
-    std::cout << "Time to Test "
-              << " ints : " << diff.count() << " s\n";
+            std::cout << (a.test(test, getAlphabet) ? "ACCEPTED" : "REJECTED") << std::endl;
+        };
+        utils::withTime(call, "Running Input");
+    }
     return 0;
-}
-extern "C" int EMSCRIPTEN_KEEPALIVE testString(std::string test)
-{
-    auto getAlphabet = [](int a) {
-        if (a == 97)
-            return 0;
-        return 1;
-    };
-    auto q0 = new FAState();
-    auto q1 = new FAState();
-    auto q2 = new FAState();
-    auto q3 = new FAState();
-    auto q4 = new FAState();
-    auto q5 = new FAState();
-    auto q6 = new FAState();
-    auto q7 = new FAState();
-    auto q8 = new FAState();
-    auto q9 = new FAState();
-    auto q10 = new FAState();
-
-    q0->transitions = {
-        {q1, q7}, {}, {}};
-    q1->transitions = {
-        {q2, q4}, {}, {}};
-    q2->transitions = {
-        {}, {q3}, {}};
-    q3->transitions = {
-        {q6}, {}, {}};
-    q4->transitions = {
-        {}, {}, {q5}};
-    q5->transitions = {
-        {q6}, {}, {}};
-    q6->transitions = {
-        {q1, q7}, {}, {}};
-    q7->transitions = {
-        {}, {q8}, {}};
-    q8->transitions = {
-        {}, {}, {q9}};
-    q9->transitions = {
-        {}, {}, {q10}};
-    q10->transitions = {
-        {}, {}, {}};
-    q10->isFinal = true;
-
-    EnfaToDfa conv(q0);
-
-    auto start = std::chrono::system_clock::now();
-    DFA a(conv.toDfa(2));
-    const auto result = a.test("ab", getAlphabet);
-    auto end = std::chrono::system_clock::now();
-    std::chrono::duration<double> diff = end - start;
-    std::cout << "Time to Test "
-              << " ints : " << diff.count() << " s\n";
-    std::cout << result << " " << test << " \n";
-    return result;
 }

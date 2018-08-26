@@ -64,9 +64,10 @@ public:
       dStates.push_back(new FAState());
     for (int i = 0; i < dfaLength; ++i)
     {
-      dStates[i]->transitions = {
-          {dStates.at(dfaTrans[i * 2])},
-          {dStates.at(dfaTrans[i * 2 + 1])}};
+      for (int j = 0; j < alphabetLength; ++j)
+      {
+        dStates[i]->transitions.push_back({dStates.at(dfaTrans[i * alphabetLength + j])});
+      }
       dStates[i]->isFinal = utils::hasFinal(dfaStates[i].second);
     }
     return dStates[0];

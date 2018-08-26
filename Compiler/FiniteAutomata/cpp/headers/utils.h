@@ -4,13 +4,10 @@
 #include "../fastate.h"
 #include <set>
 #include <iostream>
+#include <chrono>
 namespace utils
 {
-template <typename container, typename lamb>
-auto inContainer_if(container c, lamb pred)
-{
-    return std::find_if(c.begin(), c.end(), pred);
-}
+
 std::set<FAState *> eclose(std::set<FAState *> states)
 {
     std::set<FAState *> set = {};
@@ -55,40 +52,43 @@ bool setCompare(std::set<T> s1, std::set<T> s2)
         std::back_inserter(v_symDifference));
     return !(bool)v_symDifference.size();
 }
+
+bool isOperand(char x)
+{
+    return (x >= 'A' && x <= 'Z') || (x >= 'a' && x <= 'z') || (x >= '0' && x <= '9') || x == '#' ? true : false;
+}
+
+bool isOperator(char x)
+{
+    return (x == '.' || x == '*' || x == '+') ? true : false;
+}
+
+int precedence(char op)
+{
+    switch (op)
+    {
+    case '*':
+        return 4;
+    case '.':
+        return 3;
+    case '+':
+        return 2;
+    default:
+        return 1;
+    }
+}
+
+template <typename T>
+void withTime(T callback, std::string task = "Task")
+{
+    std::cout << "\n-----" << task << "-----" << std::endl;
+    auto start = std::chrono::system_clock::now();
+    callback();
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    std::cout << task << " Completed In: " << diff.count() << " s\n";
+}
+
 } // namespace utils
 
-#endif // UTILS_H                                                                                                                                  \
-       // std::set<FAState *> eclose(std::set<FAState *> states)                                                                                   \
-       // {                                                                                                                                        \
-       //     std::set<FAState *> set = {};                                                                                                        \
-       //     while (!states.empty())                                                                                                              \
-       //     {                                                                                                                                    \
-       //         auto eTrans = (*states.begin())->transitions[0];                                                                                 \
-       //         set.push_back(*states.begin());                                                                                                  \
-       //         states.erase(states.begin());                                                                                                    \
-       //         for (auto state : eTrans)                                                                                                        \
-       //         {                                                                                                                                \
-       //             if (std::find(set.begin(), set.end(), state) == set.end() && std::find(states.begin(), states.end(), state) == states.end()) \
-       //                 states.push_back(state);                                                                                                 \
-       //         }                                                                                                                                \
-       //     }                                                                                                                                    \
-       //     return set;                                                                                                                          \
-       // }                                                                                                                                        \
-       // std::set<FAState *> nonDeterTrans(std::set<FAState *> current, int alphabet)                                                             \
-       // {                                                                                                                                        \
-       //     std::set<FAState *> set = {};                                                                                                        \
-       //     for (auto state : current)                                                                                                           \
-       //     {                                                                                                                                    \
-       //         auto transStates = state->transitions[alphabet];                                                                                 \
-       //         set.insert(transStates.begin(), transStates.end());                                                                              \
-       //     }                                                                                                                                    \
-       //     std::set<FAState *> v(set.begin(), set.end());                                                                                       \
-       //     return v;                                                                                                                            \
-       // }
-
-// bool hasFinal(std::set<FAState *> states)
-// {
-//     return std::find_if(states.begin(), states.end(), [](FAState *state) {
-//                return state->isFinal;
-//            }) != states.end();
-// }
+#endif // UTILS_H

@@ -16,14 +16,15 @@ class DFA
     {
         this->start = start;
     }
-    bool test(std::string str, int (*getAlphabet)(int))
+    bool test(std::string str, auto getAlphabet)
     {
         auto current = this->start;
         auto length = str.length();
         std::cout << "Length: " << length << std::endl;
         for (unsigned int i = 0; i < length; i++)
         {
-            auto alphabet = getAlphabet(str.at(i));
+            auto alphabet = getAlphabet(str[i]);
+            if(alphabet == -1) return false;
             current = current->transitions[alphabet][0];
         }
 
