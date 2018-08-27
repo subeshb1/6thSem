@@ -21,7 +21,7 @@ std::pair<std::string, std::set<int>> reToPostfix(std::string re)
         {
             if (*i != '#')
                 alphabetSet.insert(*i);
-            if (utils::isOperand(prevChar) || prevChar == '*')
+            if (utils::isOperand(prevChar) || prevChar == '*' || prevChar == ')')
             {
                 char c = '.';
                 while (!stack.empty() && utils::precedence(c) <= utils::precedence(stack.back()))
