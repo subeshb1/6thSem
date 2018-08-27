@@ -1,4 +1,3 @@
-
 #if !defined(POSTFIX_RE_TO_ENFA_H)
 #define POSTFIX_RE_TO_ENFA_H
 #include "fastate.h"
@@ -8,12 +7,11 @@ auto enfaState(int alphabet)
 {
     static int i = 0;
     auto state = new FAState();
-    std::cout << typeid(state).hash_code() << std::endl;
     for (int i = 0; i <= alphabet; ++i)
     {
         state->transitions.push_back({});
     }
-    state->name = i;
+    state->name = std::to_string(i++);
     return state;
 }
 
@@ -62,7 +60,6 @@ std::pair<FAState *, std::set<int>> postfixToEnfa(std::pair<std::string, std::se
     auto getAlphabet = [alphabetSet](int a) {
         if (a == '#')
             return 0;
-        return 1;
         int j = 1;
         for (auto i = alphabetSet.begin(); i != alphabetSet.end(); ++i, ++j)
         {
@@ -109,6 +106,6 @@ std::pair<FAState *, std::set<int>> postfixToEnfa(std::pair<std::string, std::se
     base.second->isFinal = true;
     std::cout << "Done" << std::endl;
     return std::make_pair(base.first, alphabetSet);
-}
+}   
 
 #endif // POSTFIX_RE_TO_ENFA_H

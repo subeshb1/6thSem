@@ -16,7 +16,7 @@ class ENFA
     {
         this->start = start;
     }
-    bool test(std::string str, int (*getAlphabet)(int))
+    bool test(std::string str, auto getAlphabet)
     {
         std::set<FAState *> current = {this->start};
         current = utils::eclose(current);

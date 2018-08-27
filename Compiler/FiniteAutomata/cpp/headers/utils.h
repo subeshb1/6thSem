@@ -5,6 +5,7 @@
 #include <set>
 #include <iostream>
 #include <chrono>
+#include <numeric>
 namespace utils
 {
 
@@ -87,6 +88,19 @@ void withTime(T callback, std::string task = "Task")
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = end - start;
     std::cout << task << " Completed In: " << diff.count() << " s\n";
+}
+
+std::string stateSetToString(std::set<FAState *> set)
+{
+    if(!set.size())
+    return "###";
+    std::vector<FAState *> v(set.begin(), set.end());
+    std::sort(v.begin(), v.end(), [](FAState *state1, FAState *state2) {
+        return state1->name < state2->name;
+    });
+    return std::accumulate(std::next(v.begin()), v.end(), v[0]->name, [](std::string acc, FAState *state) {
+        return acc + "-" + state->name;
+    });
 }
 
 } // namespace utils
