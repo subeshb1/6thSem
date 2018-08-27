@@ -70,6 +70,7 @@ public:
       }
       dStates[i]->isFinal = utils::hasFinal(dfaStates[i].second);
     }
+    std::cout << dfaTrans.size()  << " "<< dStates.size() << " " << alphabetLength  << std::endl;
     return dStates[0];
   }
 };
