@@ -9,7 +9,7 @@
 
 std::pair<std::string, std::set<int>> reToPostfix(std::string re)
 {
-
+    std::cout << "RE Length: " << re.size() << std::endl;
     std::string postfix = "";
     std::vector<char> stack;
     std::set<int> alphabetSet;
@@ -19,7 +19,7 @@ std::pair<std::string, std::set<int>> reToPostfix(std::string re)
 
         if (utils::isOperand(*i))
         {
-            if (*i != '#')
+            if (*i != '#' && *i!= '$')
                 alphabetSet.insert(*i);
             if (utils::isOperand(prevChar) || prevChar == '*' || prevChar == ')')
             {

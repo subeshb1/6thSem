@@ -13,6 +13,9 @@ struct FAState
     {
         isFinal = false;
     }
+    ~FAState() {
+        delete this;
+    }
     FAState(std::string name, std::vector<std::vector<FAState *>> transitions, bool isFinal = false)
     {
         this->name = name;

@@ -73,20 +73,18 @@ public:
     {
       for (int j = 0; j < alphabetLength; ++j)
       {
-        // std::cout << "Enter" << std::endl;
-        // std::cout << "Transitions: " << transitions.at(i * alphabetLength + j).first << std::endl;
+
         dStates[i]->transitions.push_back({dStates.at(transitions[i * alphabetLength + j].first)});
       }
 
       dStates[i]->isFinal = utils::hasFinal(transitions[i * alphabetLength].second);
-      
     }
 
-    std::cout << transitions.size() << " " << dStates.size() << " " << alphabetLength << std::endl;
+    std::cout << "Number of Transitions: " << transitions.size() << std::endl
+              << "Number of States(DFA): " << dStates.size() << std::endl
+              << "Number of Alphabet: " << alphabetLength << std::endl;
     return dStates[0];
   }
-
-  
 };
 
 #endif // ENFA_TO_DFA_H
