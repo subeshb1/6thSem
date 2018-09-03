@@ -520,6 +520,7 @@ All HTML elements can be considered as boxes. In CSS, the term "box model" is us
 The CSS box model is essentially a box that wraps around every HTML element. It consists of: margins, borders, padding, and the actual content. The image below illustrates the box model:
 
 ![Box Model](<https://mdn.mozillademos.org/files/8685/boxmodel-(3).png> "Box Model")
+
 Explanation of the different parts:
 
 - Content - The content of the box, where text and images appear

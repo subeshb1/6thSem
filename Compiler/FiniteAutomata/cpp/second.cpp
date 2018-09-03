@@ -102,10 +102,49 @@ bool number(std::string s)
     std::cout << (a.test(s, getAlphabet) ? "ACCEPTED" : "REJECTED") << std::endl;
 }
 
+bool matchOneLineComments(std::string s)
+{
+    auto pregex = reToPostfix("aa(a|b)*c");
+    std::cout << pregex.first;
+    auto startState = postfixToEnfa(pregex);
+    auto alphabetSet = pregex.second;
+    auto getAlphabet = [&](int a) {
+        if (a == '/')
+            return 0;
+        if (a != '\n')
+            return 1;
+        return 2;
+    };
+    EnfaToDfa b(startState.first);
+    DFA a(b.toDfa(alphabetSet.size()));
+
+    std::cout << (a.test(s, getAlphabet) ? "ACCEPTED" : "REJECTED") << std::endl;
+}
+
+bool matchMultiLineComments(std::string s)
+{
+    auto pregex = reToPostfix("ab(a|b|c)*ba");
+    std::cout << pregex.first;
+    auto startState = postfixToEnfa(pregex);
+    auto alphabetSet = pregex.second;
+    auto getAlphabet = [&](int a) {
+        if (a == '/')
+            return 0;
+        if (a == '*')
+            return 1;
+        return 2;
+    };
+    EnfaToDfa b(startState.first);
+    DFA a(b.toDfa(alphabetSet.size()));
+
+    std::cout << (a.test(s, getAlphabet) ? "ACCEPTED" : "REJECTED") << std::endl;
+}
+
 int main(int argc, char const *argv[])
 {
     // testIdentifier(argc>1?argv[1]:"functionName");
-    number(argc>1?argv[1]:"0191");
+    // number(argc > 1 ? argv[1] : "0191");
+    matchMultiLineComments("/*Subesh");
 
     if (argc > 1)
     {
