@@ -456,9 +456,217 @@ Here is a list of some common HTML events:
 | `onkeydown`   | The user pushes a keyboard key                     |
 | `onload`      | The browser has finished loading the page          |
 
-#### Error Handling
+### Error Handling
 
 The try statement lets you test a block of code for errors.
 The catch statement lets you handle the error.
 The throw statement lets you create custom errors.
 The finally statement lets you execute code, after try and catch, regardless of the result.
+
+Example:
+
+```js
+function myFunction() {
+  var message, x;
+  message = document.getElementById("p01");
+  message.innerHTML = "";
+  x = document.getElementById("demo").value;
+  try {
+    if (x == "") throw "is empty";
+    if (isNaN(x)) throw "is not a number";
+    x = Number(x);
+    if (x > 10) throw "is too high";
+    if (x < 5) throw "is too low";
+  } catch (err) {
+    message.innerHTML = "Error: " + err + ".";
+  } finally {
+    document.getElementById("demo").value = "";
+  }
+}
+```
+
+### Cookies
+
+Cookies are data, stored in small text files, on your computer.
+When a web server has sent a web page to a browser, the connection is shut down, and the server forgets everything about the user.
+Cookies were invented to solve the problem "how to remember information about the user":
+
+- When a user visits a web page, his name can be stored in a cookie.
+- Next time the user visits the page, the cookie "remembers" his name.
+
+JavaScript can create, read, and delete cookies with the document.cookie property.
+
+With JavaScript, a cookie can be created like this:
+
+```js
+document.cookie = "username=John Doe";
+
+/*You can also add an expiry date (in UTC time). By default, the cookie is deleted when the browser is closed:*/
+document.cookie = "username=John Doe; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+
+/*With a path parameter, you can tell the browser what path the cookie belongs to. By default, the cookie belongs to the current page.*/
+document.cookie =
+  "username=John Doe; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+```
+
+## QN 10. Make a simple website that takes information about a user. Use client-side script to validate user input. [Model Question]
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+  </head>
+  <body>
+    <form >
+      <label>Email Address<input type="text" placeholder="Email" name="email"></label>
+      <br>
+      <label>Password<input type="password" placeholder="Password" name="password"></label>
+      <br>
+      <div id="error"></div>
+      <div id="success"></div>
+      <input type="submit" value="Submit" >
+    </form>
+    <script>
+
+      window.onload=function() {
+        var form  = document.forms[0];
+        var error  = document.getElementById('error');
+        var success  = document.getElementById('success');
+        form.onsubmit = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var email = form["email"].value;
+          var password = form["password"].value;
+          var emailValidator = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          if( ! emailValidator.test(email)) {
+            error.innerHTML ="Invalid Email";return;
+          }
+          if( password.length < 8) {
+            error.innerHTML ="Password Length should be greater than 7";  return;
+          }
+          success.innerHTML = "Success!";
+
+        }
+      }
+    </script>
+  </body>
+</html>
+```
+
+## QN 11. Use client-side script to validate the user input during login process
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+  </head>
+  <body>
+    <form >
+      <h1>Login</h1>
+      <label>Email Address<input type="text" placeholder="Email" name="email"></label>
+      <br>
+      <label>Password<input type="password" placeholder="Password" name="password"></label>
+      <br>
+      <div id="error"></div>
+      <div id="success"></div>
+      <input type="submit" value="Log In" >
+    </form>
+    <script>
+
+      window.onload=function() {
+        var form  = document.forms[0];
+        var error  = document.getElementById('error');
+        var success  = document.getElementById('success');
+        form.onsubmit = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var email = form["email"].value;
+          var password = form["password"].value;
+          var emailValidator = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          if( ! emailValidator.test(email)) {
+            error.innerHTML ="Invalid Email";return;
+          }
+          if( password.length < 8) {
+            error.innerHTML ="Password Length should be greater than 7";  return;
+          }
+          success.innerHTML = "Success!";
+
+        }
+      }
+    </script>
+  </body>
+</html>
+```
+
+## QN 12. Use client side script to validate the user input during registration
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+  </head>
+  <body>
+    <form >
+      <h1></h1>
+      <label >
+        Full Name
+        <input type="text" placeholder="Name" name="name">
+      </label><br>
+      <label>Email Address<input type="text" placeholder="Email" name="email"></label>
+      <br>
+      <label>Password<input type="password" placeholder="Password" name="password"></label>
+      <br>
+      <label>Confirm Password<input type="password" placeholder="Password" name="confirm-password"></label>
+      <br>
+      <div id="error"></div>
+      <div id="success"></div>
+      <input type="submit" value="Register" >
+    </form>
+    <script>
+
+      window.onload=function() {
+        var form  = document.forms[0];
+        var error  = document.getElementById('error');
+        var success  = document.getElementById('success');
+        form.onsubmit = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var name = form["name"].value;
+          var email = form["email"].value;
+          var password = form["password"].value;
+          var confirmPassword = form["confirm-password"].value;
+          var emailValidator = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if( name.length < 2) {
+            error.innerHTML ="Name length should be longer than 2";return;
+          }
+          if( ! emailValidator.test(email)) {
+            error.innerHTML ="Invalid Email";return;
+          }
+          if( password.length < 8) {
+            error.innerHTML ="Password Length should be greater than 7";  return;
+          }
+           if( password !== confirmPassword) {
+            error.innerHTML ="Passwords dont match";  return;
+          }
+          success.innerHTML = "Success!";
+
+        }
+      }
+    </script>
+  </body>
+</html>
+```
