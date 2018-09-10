@@ -670,3 +670,92 @@ document.cookie =
   </body>
 </html>
 ```
+
+## QN 13. What are two traditional ways of assigning event handlers in DOM? Explain
+
+Event handling has been part of JavaScript since the language's inception. The DOM of modern web browsers such as IE5+, NS6+, and Firefox provide expanded methods and flexibility (relative to older browsers) for capturing events.
+The two traditional way of assigning event handling are described below:
+Via HTML, using attributes
+We can define an event handler directly inside the relevant HTML tag, by embedding it as a attribute. A piece of JavaScript is also included to tell the browser to perform something when the event occurs.
+Example:
+
+```html
+<a href="http://freewarejava.com" onMouseover="window.status='Click here for Java applets';return true" onMouseout="window.status=''">Freewarejava.com</a>
+```
+
+Via scripting
+
+You can also assign and set up event handlers to elements using scripting, and inside your script . This allows for the event handlers to be dynamically set up, without having to mess around with the HTML codes on the page.
+When setting up event handlers for an element directly inside your script, the code to execute for the events must be defined inside a function.
+
+Example:
+
+```html
+<a ID="test" href="Example.com">Example </a>
+<script type="text/javascript">
+function changestatus(){
+window.status="Click here for some Examples"
+return true
+}
+function changebackstatus(){
+window.status=''
+}
+document.getElementById("test").onmouseover=changestatus
+document.getElementById("test").onmouseout=changebackstatus
+</script>
+```
+
+## QN 14. Explain about the process of changing an HTML element with the help of DOM.
+
+The HTML DOM allows JavaScript to change the content of HTML elements.
+Changing HTML Output Stream
+JavaScript can create dynamic HTML content:
+Date: Mon Sep 10 2018 19:40:23 GMT+0545 (Nepal Time)
+In JavaScript, document.write() can be used to write directly to the HTML output stream
+
+Example:
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+document.write(Date());
+</script>
+</body>
+</html>
+Changing HTML Content
+The easiest way to modify the content of an HTML element is by using the innerHTML property.
+Syntax:
+document.getElementById(id).innerHTML = new HTML
+Example:
+<html>
+<body>
+<p id="p1">HelloWorld!</p>
+<script>
+document.getElementById("p1").innerHTML = "Newtext!";
+</script>
+</body>
+</html>
+```
+
+Changing the Value of an Attribute
+getElementByID.attribute() is used in Javascript to change the value of an attribute of an HTML element.
+Syntax:
+document.getElementById(id).attribute = new value
+Example:
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<img id="myImage" src="smiley.gif">
+
+<script>
+document.getElementById("myImage").src = "landscape.jpg";
+</script>
+
+</body>
+</html>
+```
