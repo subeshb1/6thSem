@@ -6,16 +6,15 @@
 #include <functional>
 #include <algorithm>
 #include <iterator>
-#include "direct_method.h"
-#include "dfa.h"
-#include "fastate.h"
-#include "nfa.h"
-#include "enfa.h"
-#include "enfatodfa.h"
+#include "headers/direct_method.h"
+#include "headers/dfa.h"
+#include "headers/fastate.h"
+#include "headers/nfa.h"
+#include "headers/enfa.h"
+#include "headers/enfatodfa.h"
 #include <set>
-#include "re_to_postfix.h"
-#include "postfix_re_to_enfa.h"
-// #include <emscripten/emscripten.h>
+#include "headers/re_to_postfix.h"
+#include "headers/postfix_re_to_enfa.h"
 
 void regExp(std::string regex, std::string test)
 {

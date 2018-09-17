@@ -1,7 +1,7 @@
 #if !defined(UTILS_H)
 #define UTILS_H
 #include <set>
-#include "../fastate.h"
+#include "fastate.h"
 #include <set>
 #include <iostream>
 #include <chrono>

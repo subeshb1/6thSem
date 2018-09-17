@@ -8,7 +8,7 @@
 #include <chrono>
 #include <functional>
 #include <algorithm>
-#include "headers/utils.h"
+#include "utils.h"
 class NFA
 {
   public:

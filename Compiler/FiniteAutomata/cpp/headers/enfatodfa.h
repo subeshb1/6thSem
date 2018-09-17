@@ -3,7 +3,7 @@
 #define ENFA_TO_DFA_H
 
 #include "fastate.h"
-#include "headers/utils.h"
+#include "utils.h"
 #include <vector>
 #include <set>
 #include <map>

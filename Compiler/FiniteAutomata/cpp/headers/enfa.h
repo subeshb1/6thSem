@@ -7,7 +7,7 @@
 #include <fstream>
 #include <chrono>
 #include <algorithm>
-#include "headers/utils.h"
+#include "utils.h"
 #include <set>
 class ENFA
 {

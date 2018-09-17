@@ -1,7 +1,7 @@
 #if !defined(POSTFIX_RE_TO_ENFA_H)
 #define POSTFIX_RE_TO_ENFA_H
 #include "fastate.h"
-#include "headers/utils.h"
+#include "utils.h"
 #include <iostream>
 auto enfaState(int alphabet)
 {

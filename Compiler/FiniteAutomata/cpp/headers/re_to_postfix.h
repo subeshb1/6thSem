@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
-#include "headers/utils.h"
+#include "utils.h"
 
 std::pair<std::string, std::set<int>> reToPostfix(std::string re)
 {

@@ -3,7 +3,7 @@
 #define DIRECT_METHOD_H
 #include <algorithm>
 #include "fastate.h"
-#include "headers/utils.h"
+#include "utils.h"
 #include <iostream>
 #include <set>
 #include <iterator>
