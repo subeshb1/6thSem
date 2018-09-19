@@ -22,73 +22,44 @@
 #include <set>
 #include "../headers/re_to_postfix.h"
 #include "../headers/postfix_re_to_enfa.h"
-bool testIdentifier(std::string s)
-{
-
-  auto pregex = reToPostfix("a(a|b)*");
-  auto startState = postfixToEnfa(pregex);
-  auto alphabetSet = pregex.second;
-
-  auto getAlphabet = [](int a) {
-    if (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z' || a == '_')
-      return 0;
-    if (a >= '0' && a <= '9')
-      return 1;
-    return -1;
-  };
-  EnfaToDfa b(startState.first);
-  DFA a(b.toDfa(alphabetSet.size()));
-
-  std::cout << (a.test(s, getAlphabet) ? "ACCEPTED" : "REJECTED") << std::endl;
-}
-
-bool number(std::string s)
-{
-
-  auto pregex = reToPostfix("aa*");
-  std::cout << pregex.first;
-  auto startState = postfixToEnfa(pregex);
-  auto alphabetSet = pregex.second;
-
-  auto getAlphabet = [&](int a) {
-    if (a >= '0' && a <= '9')
-      return 0;
-    return -1;
-  };
-  EnfaToDfa b(startState.first);
-  DFA a(b.toDfa(alphabetSet.size()));
-
-  std::cout << (a.test(s, getAlphabet) ? "ACCEPTED" : "REJECTED") << std::endl;
-}
+#include "lexer-utils.h"
 
 typedef enum
 {
   IDENTIFIER,
   NUMBER,
   KEYWORD,
+  LITERAL,
   OPERATOR,
-  ENDOFFILE,
-  SPECIALCHARACTER
+  EOT,
+  PUNCTUATOR,
+  UNDEF
 } TokenType;
-std::string arr[6] =
+std::string arr[8] =
     {
         "IDENTIFIER",
         "NUMBER",
         "KEYWORD",
+        "LITERAL",
         "OPERATOR",
-        "ENDOFFILE",
-        "SPECIALCHARACTER"};
+        "EOT",
+        "PUNCTUATOR",
+        "UNDEF"};
+
 struct Token
 {
-  Token(TokenType type, std::string value = "EMPTY", long line = 0, long column = 0)
+
+  Token(TokenType type, std::string value = "EMPTY", long line = 0, long column = 0, std::string extra = "")
   {
     this->column = column;
     this->value = value;
     this->line = line;
     this->type = type;
+    this->extra = extra;
   }
   TokenType type;
   std::string value;
+  std::string extra;
   long line;
   long column;
 };
@@ -98,7 +69,6 @@ struct Token
  * **/
 class Lexer
 {
-private:
 public:
   /**
  * @constructor
@@ -106,6 +76,7 @@ public:
 */
   Lexer(std::string fileName)
   {
+
     this->position = 0;
     this->line = 0;
     this->column = 0;
@@ -118,131 +89,64 @@ public:
     this->input = buffer.str();
     std::cout << this->input;
   }
-
+  /**
+   * summarry - returns next token in sequence pointed by line  number and column number
+   * @method
+   * @return {std::shared_ptr<Token>} - A Token
+  */
   std::shared_ptr<Token> nextToken()
   {
+    // Checking if the scanning is complete
     if (position >= input.length())
     {
-      return std::shared_ptr<Token>(new Token(ENDOFFILE));
+      //End
+      return std::make_shared<Token>(EOT);
     }
-    skipWhiteSpace();
-    const char character = input.at(position);
-    if (isLetter(character))
+    char character = input.at(position);
+    if (lex::isAlphabet(character))
     {
-      return recognizeID();
+      // return processAlphabet();
     }
-    if (isDigit(character))
+    else if (lex::isDigit(character))
+    {
+      // return processDigit();
+    }
+    else if (lex::isDelimeter(character))
+    {
+      // return processDelimeter();
+    }
+    else if (lex::isOperator(character))
+    {
+      // return processOperator();
+    }
 
-    {
-      std::cout << "Enter";
-      return recognizeNumber();
-    }
-    std::string dat = "";
-    dat +=   input.at(position++) ;
-    return std::shared_ptr<Token>(new Token(SPECIALCHARACTER, dat     ));
+    // If any invalid character is found or no matches found
+    return std::make_shared<Token>(UNDEF, character, line, column);
   }
-  std::shared_ptr<Token> recognizeID()
-  {
-    std::string id = "";
-    long position = this->position;
-    long line = this->line;
-    long column = this->column;
-    char character = this->input.at(position);
-    while (position < this->input.length())
-    {
-      char character = this->input.at(position);
 
-      if (!(isLetter(character) || isDigit(character)))
-      {
+  std::shared_ptr<Token> processAlphabet()
+  {
+    long lookAhead = position;
+    long startColNum = column;
+
+    std::string word = "";
+    word += input.at(lookAhead);
+    char nextChar = input.at(++lookAhead);
+    while (lex::isAlphabet(nextChar) && lex::isDigit(nextChar))
+    {
+      word += nextChar;
+      if (++lookAhead >= input.length())
         break;
-      }
-
-      id += character;
-      position += 1;
+      nextChar = input.at(lookAhead);
+    }
+    position = lookAhead;
+    column += lookAhead;
+    if (lex::isKeyWord(word))
+      return std::make_shared<Token>(KEYWORD, word, line, startColNum);
+    return std::make_shared<Token>(IDENTIFIER, word, line, startColNum);
     }
 
-    this->position += id.length();
-    this->column += id.length();
-
-    return std::shared_ptr<Token>(new Token(IDENTIFIER, id, line, column));
-  }
-
-  std::shared_ptr<Token> recognizeNumber()
-  {
-    std::string number = "";
-    long position = this->position;
-    long line = this->line;
-    long column = this->column;
-    char character = this->input.at(position);
-    while (position < this->input.length())
-    {
-      char character = this->input.at(position);
-
-      if (!(isDigit(character)))
-      {
-        break;
-      }
-
-      number += character;
-      position += 1;
-    }
-
-    this->position += number.length();
-    this->column += number.length();
-
-    return std::shared_ptr<Token>(new Token(NUMBER, number, line, column));
-  }
-
-  bool isDigit(char a)
-  {
-    return a >= '0' && a <= '9';
-  }
-  void skipWhiteSpace()
-  {
-
-    while (position < input.length() && isWhiteSpace(input.at(position)))
-    {
-    
-      position++;
-      if (isNewLine(input.at(position)))
-      {
-        line += 1;
-        column = 0;
-      }
-      else
-        column += 1;
-    }
-  }
-
-  bool isWhiteSpace(char a)
-  {
-    return a == ' ' || a == '\t' || a == '\n' || a=='\r';
-  }
-  bool isLetter(char a)
-  {
-    return (a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z') || a == '_';
-  }
-  bool isNewLine(char a)
-  {
-    return a == '\n' || a=='\r';
-  }
-
-  void allTokens()
-  {
-    auto token = nextToken();
-
-    while (token->type != ENDOFFILE)
-    {
-      std::cout << std::endl
-                << "TOKEN" << std::endl;
-      std::cout << "TYPE: " << arr[token->type] << std::endl;
-      std::cout << "VALUE: " << token->value << std::endl;
-      std::cout << "LINE: " << token->line << std::endl;
-      std::cout << "COLUMN: " << token->column << std::endl;
-      token = nextToken();
-    }
-  }
-
+private:
   std::ifstream file;
   int position;
   int line;
