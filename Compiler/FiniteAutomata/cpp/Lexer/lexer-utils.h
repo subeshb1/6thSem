@@ -2,11 +2,12 @@
 
 #if !defined(LEXER_UTILS_H)
 #define LEXER_UTILS_H
-#include <vector>
+#include <set>
 #include <algorithm>
 #include <string>
 namespace lex
 {
+const std::set<std::string> keyWords = {"asm", "else", "new", "this", "auto", "enum", "operator", "throw", "bool", "explicit", "private", "true", "break", "export", "protected", "try", "case", "extern", "public", "typedef", "catch", "false", "register", "typeid", "char", "float", "reinterpret_cast", "typename", "class", "for", "return", "union", "const", "friend", "short", "unsigned", "const_cast", "goto", "signed", "using", "continue", "if", "sizeof", "virtual", "default", "inline", "static", "void", "delete", "int", "static_cast", "volatile", "do", "long", "struct", "wchar_t", "double", "mutable", "switch", "while", "dynamic_cast", "namespace", "template", "elif", "endif", "ifdef", "ifndef", "define", "undef", "include", "line", "error", "pragma", "defined"};
 
 bool isDigit(char a)
 {
@@ -35,8 +36,7 @@ bool isOperator(char a)
 
 bool isKeyWord(std::string keyWord)
 {
-    const std::vector<std::string> keyWords = {"asm", "else", "new", "this", "auto", "enum", "operator", "throw", "bool", "explicit", "private", "true", "break", "export", "protected", "try", "case", "extern", "public", "typedef", "catch", "false", "register", "typeid", "char", "float", "reinterpret_cast", "typename", "class", "for", "return", "union", "const", "friend", "short", "unsigned", "const_cast", "goto", "signed", "using", "continue", "if", "sizeof", "virtual", "default", "inline", "static", "void", "delete", "int", "static_cast", "volatile", "do", "long", "struct", "wchar_t", "double", "mutable", "switch", "while", "dynamic_cast", "namespace", "template"};
-    return std::find(keyWords.begin(), keyWords.end(), keyWord) != keyWords.end();
+    return keyWords.find(keyWord) != keyWords.end();
 }
 } // namespace lex
 

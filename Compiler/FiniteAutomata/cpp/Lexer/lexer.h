@@ -32,7 +32,7 @@ typedef enum
   LITERAL,
   OPERATOR,
   EOT,
-  PUNCTUATOR,
+  DELIMETER,
   UNDEF
 } TokenType;
 std::string arr[8] =
@@ -43,7 +43,7 @@ std::string arr[8] =
         "LITERAL",
         "OPERATOR",
         "EOT",
-        "PUNCTUATOR",
+        "DELIMETER",
         "UNDEF"};
 
 struct Token
@@ -78,8 +78,8 @@ public:
   {
 
     this->position = 0;
-    this->line = 0;
-    this->column = 0;
+    this->line = 1;
+    this->column = 1;
     file.open(fileName);
 
     if (!file)
@@ -96,6 +96,7 @@ public:
   */
   std::shared_ptr<Token> nextToken()
   {
+    skipWhiteSpace();
     // Checking if the scanning is complete
     if (position >= input.length())
     {
@@ -105,7 +106,7 @@ public:
     char character = input.at(position);
     if (lex::isAlphabet(character))
     {
-      // return processAlphabet();
+      return processAlphabet();
     }
     else if (lex::isDigit(character))
     {
@@ -113,38 +114,125 @@ public:
     }
     else if (lex::isDelimeter(character))
     {
-      // return processDelimeter();
+      return processDelimeter();
     }
     else if (lex::isOperator(character))
     {
-      // return processOperator();
+      return processOperator();
     }
 
+    position++;
+    column++;
     // If any invalid character is found or no matches found
-    return std::make_shared<Token>(UNDEF, character, line, column);
+    return std::make_shared<Token>(UNDEF, "", line, column);
   }
 
+  /**
+   * summarry - returns an identifier or a keyword using lookahead
+   * @method
+   * @return {Token}
+  */
   std::shared_ptr<Token> processAlphabet()
   {
+    //look ahead buffer
     long lookAhead = position;
+    //the column pointing identifier start
     long startColNum = column;
 
+    //Containing the word
     std::string word = "";
     word += input.at(lookAhead);
+
     char nextChar = input.at(++lookAhead);
-    while (lex::isAlphabet(nextChar) && lex::isDigit(nextChar))
+
+    // Looking ahead until valid characters
+    while (lex::isAlphabet(nextChar) || lex::isDigit(nextChar))
     {
       word += nextChar;
       if (++lookAhead >= input.length())
         break;
       nextChar = input.at(lookAhead);
     }
+    //updating new values
     position = lookAhead;
-    column += lookAhead;
+    column += word.length();
+
+    //checking for keyword or identifier
     if (lex::isKeyWord(word))
       return std::make_shared<Token>(KEYWORD, word, line, startColNum);
     return std::make_shared<Token>(IDENTIFIER, word, line, startColNum);
+  }
+
+  /**
+   * summarry - returns Delimeter tokens
+   * @method processDelimeter
+   * @return {Token}
+  */
+  std::shared_ptr<Token> processDelimeter()
+  {
+    std::string delim = "";
+    delim += input.at(position++);
+    return std::make_shared<Token>(DELIMETER, delim, line, column++);
+  }
+  /**
+   * summarry - returns Operators token
+   * @method processOperator
+   * @return {Token}
+  */
+  std::shared_ptr<Token> processOperator()
+  {
+    std::string oper = "";
+    oper += input.at(position++);
+    return std::make_shared<Token>(OPERATOR, oper, line, column++);
+  }
+
+  /**
+   * summarry - Skips all white space incrementing column and line count
+   * @method
+  */
+  void skipWhiteSpace()
+  {
+    if (position >= input.length())
+      return;
+    char currentChar = input.at(position);
+
+    while (lex::isWhiteSpace(currentChar))
+    {
+      if (currentChar == '\n')
+      {
+        column = 1;
+        line += 1;
+      }
+      else
+      {
+        column += 1;
+      }
+      if (++position >= input.length())
+        break;
+      currentChar = input.at(position);
     }
+  }
+  /**
+   * summarry - Prints out all the token
+   * @method
+  */
+  void allTokens()
+  {
+    auto token = nextToken();
+    while (token->type != EOT)
+    {
+      if (token->type != UNDEF)
+      {
+        std::cout << std::endl
+                  << "TOKEN" << std::endl;
+        std::cout << "TYPE: " << arr[token->type] << std::endl;
+        std::cout << "VALUE: " << token->value << std::endl;
+        std::cout << "LINE: " << token->line << std::endl;
+        std::cout << "COLUMN: " << token->column << std::endl;
+      }
+      token = nextToken();
+    }
+  }
 
 private:
   std::ifstream file;

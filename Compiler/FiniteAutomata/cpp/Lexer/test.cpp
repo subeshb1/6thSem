@@ -4,12 +4,12 @@
 
 int main(int argc, char const *argv[])
 {
-    Lexer a("data.js");
+    Lexer a("test.cpp");
 
-
+      int b = 1;
     
       a.allTokens();
-
+    
     /* code */
     return 0;
 }
