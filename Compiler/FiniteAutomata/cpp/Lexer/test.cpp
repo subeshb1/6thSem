@@ -1,15 +1,17 @@
 #include "lexer.h"
 #include <iostream>
-
+#include "../headers/utils.h"
 
 int main(int argc, char const *argv[])
 {
-    Lexer a("test.cpp");
 
-      int b = 1;
-    
-      a.allTokens();
-    
-    /* code */
-    return 0;
+  auto callback = []() {
+    Lexer a("dummy.cpp");
+    a.allTokens();
+  };
+
+  utils::withTime(callback, "Syntax Analysis");
+
+  /* code */
+  return 0;
 }

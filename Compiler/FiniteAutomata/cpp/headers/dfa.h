@@ -24,11 +24,23 @@ class DFA
         for (unsigned int i = 0; i < length; i++)
         {
             auto alphabet = getAlphabet(str[i]);
-            if(alphabet == -1) return false;
+            if (alphabet == -1)
+                return false;
             current = current->transitions[alphabet][0];
         }
 
         return current->isFinal;
+    }
+
+    static FAState *next(FAState *state, int (*getAlphabet)(int), char character)
+    {
+        auto alphabet = getAlphabet(character);
+    }
+    static bool isRejected(FAState *s)
+    {
+        return s->isFinal ? false : std::all_of(s->transitions.begin(), s->transitions.end(), [s](std::vector<FAState *> trans) {
+            return trans[0] == s;
+        });
     }
 
   private:
