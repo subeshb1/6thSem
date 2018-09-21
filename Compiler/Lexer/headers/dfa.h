@@ -16,11 +16,10 @@ class DFA
     {
         this->start = start;
     }
-    bool test(std::string str, int(* getAlphabet) (int))
+    bool test(std::string str, int (*getAlphabet)(int))
     {
         auto current = this->start;
         auto length = str.length();
-        std::cout << "Length: " << length << std::endl;
         for (unsigned int i = 0; i < length; i++)
         {
             auto alphabet = getAlphabet(str[i]);
@@ -35,7 +34,6 @@ class DFA
     {
         auto current = this->start;
         auto length = str.length();
-        std::cout << "Length: " << length << std::endl;
         for (unsigned int i = 0; i < length; i++)
         {
             auto alphabet = getAlphabet(str[i]);
@@ -50,6 +48,9 @@ class DFA
     static FAState *next(FAState *state, int (*getAlphabet)(int), char character)
     {
         auto alphabet = getAlphabet(character);
+        if (alphabet == -1)
+            throw "No Transition for character";
+        return state->transitions.at(alphabet).at(0);
     }
     static bool isRejected(FAState *s)
     {

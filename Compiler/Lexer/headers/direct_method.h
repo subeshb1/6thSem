@@ -105,9 +105,7 @@ FAState *nodesToSate(std::set<int> startSet, std::vector<std::pair<int, std::set
         });
     }
 
-    std::cout << "Number of Transitions: " << transitions.size() << std::endl
-              << "Number of States(DFA): " << dStates.size() << std::endl
-              << "Number of Alphabet: " << alphabetLength << std::endl;
+    
     return dStates[0];
 }
 
@@ -184,9 +182,7 @@ std::pair<FAState *, std::set<int>> directMethod(std::pair<std::string, std::set
         }
     }
     auto rootNode = stack.front();
-    std::cout << "Stack Size " << stack.size() << std::endl;
-    std::cout << "Root First Pos: " << rootNode->firstPos.size() << std::endl;
-    std::cout << "Root Last Pos: " << rootNode->lastPos.size() << std::endl;
+    
     return std::make_pair(nodesToSate(rootNode->firstPos, nodes, alphabet), alphabetSet);
 }
 
