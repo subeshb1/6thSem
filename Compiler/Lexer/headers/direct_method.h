@@ -9,6 +9,7 @@
 #include <iterator>
 #include <deque>
 #include <unordered_map>
+#include "dfa.h"
 struct Node
 {
     bool nullable;
@@ -103,9 +104,14 @@ FAState *nodesToSate(std::set<int> startSet, std::vector<std::pair<int, std::set
         dStates[i]->isFinal = std::any_of(transitions[i * alphabetLength].second.begin(), transitions[i * alphabetLength].second.end(), [&nodes](int a) {
             return nodes[a].first == -1;
         });
+
+        // To check if the state is rejected
+        if (!dStates[i]->isFinal)
+        {
+            dStates[i]->isRejected = DFA::isRejected(dStates[i]);
+        }
     }
 
-    
     return dStates[0];
 }
 
@@ -182,7 +188,7 @@ std::pair<FAState *, std::set<int>> directMethod(std::pair<std::string, std::set
         }
     }
     auto rootNode = stack.front();
-    
+
     return std::make_pair(nodesToSate(rootNode->firstPos, nodes, alphabet), alphabetSet);
 }
 

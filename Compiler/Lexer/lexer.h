@@ -111,7 +111,11 @@ public:
     }
     else if (lex::isDigit(character))
     {
-      // return processDigit();
+      return processDigit();
+    }
+    else if (lex::isStringOrChar(character))
+    {
+      return processStringChar();
     }
     else if (lex::isDelimeter(character))
     {
@@ -194,6 +198,79 @@ public:
   }
 
   /**
+   * summarry - returns Number Token 
+   * @method processDigit
+   * @return {Token}
+  */
+  std::shared_ptr<Token> processStringChar()
+  {
+    std::string literal = "";
+    auto lookAhead = this->position;
+    auto column = this->column;
+
+    const auto quote = input.at(position);
+    literal += quote;
+    char character;
+    do
+    {
+      if (++lookAhead >= input.length())
+      {
+        break;
+      }
+      character = input.at(lookAhead);
+
+      if (character == '\n')
+      {
+        position = lookAhead + 1;
+        line += 1;
+        column = 1;
+        return std::make_shared<Token>(UNDEF, literal, line, column);
+      }
+      literal += character;
+
+    } while (character != quote);
+
+    this->position = lookAhead + 1;
+    this->column += literal.length();
+    tokenCount[LITERAL]++;
+    return std::make_shared<Token>(LITERAL, literal, line, column);
+  }
+  /**
+   * summarry - returns Number Token 
+   * @method processDigit
+   * @return {Token}
+  */
+  std::shared_ptr<Token> processDigit()
+  {
+    std::string number = "";
+    auto lookAhead = this->position;
+    auto column = this->column;
+    auto position = this->position;
+    auto currentState = lex::NUMBER_FSM;
+    do
+    {
+      if (lookAhead >= input.length())
+        break;
+      auto character = input.at(lookAhead);
+      currentState = DFA::next(currentState, lex::getNumberAlphabet, character);
+
+      if (currentState->isFinal)
+      {
+        position = lookAhead;
+      }
+      number += character;
+      ++lookAhead;
+
+    } while (!currentState->isRejected);
+
+    std::string acceptedNumber = number.substr(0, position - this->position + 1);
+    this->position = position + 1;
+    this->column += acceptedNumber.length();
+    tokenCount[NUMBER]++;
+    return std::make_shared<Token>(NUMBER, acceptedNumber, line, column);
+  }
+
+  /**
    * summarry - Skips all white space incrementing column and line count
    * @method
   */
@@ -246,8 +323,65 @@ public:
     {
       std::cout << arr[i] << "COUNT: " << tokenCount[i] << std::endl;
     }
-    std::cout << std::endl << "TOTAL TOKENS COUNT: "
-             << std::accumulate(tokenCount.begin(), tokenCount.end(), 0) << std::endl;
+    std::cout << std::endl
+              << "TOTAL TOKENS COUNT: "
+              << std::accumulate(tokenCount.begin(), tokenCount.end(), 0) << std::endl;
+  }
+
+  void toHTML()
+  {
+    std::ofstream file("output.txt");
+    file << "<pre>";
+    auto token = nextToken();
+    int line = 1;
+    int column = 1;
+
+    auto addLine = [&]() mutable {
+      file << '\n';
+      line++;
+      column = 1;
+    };
+    auto addColumn = [&](int col) mutable {
+      const auto diff = col - column;
+      for (int i = 0; i < diff; i++)
+      {
+        file << " ";
+      }
+    };
+    while (token->type != EOT)
+    {
+      std::string color = "black";
+      switch (token->type)
+      {
+      case IDENTIFIER:
+        color = "red";
+        break;
+      case NUMBER:
+        color = "purple";
+        break;
+      case KEYWORD:
+        color = "blue";
+        break;
+      case LITERAL:
+        color = "green";
+        break;
+      case OPERATOR:
+        color = "yellow";
+        break;
+      case DELIMETER:
+        color = "skyblue";
+        break;
+      }
+      if (line != token->line)
+        addLine();
+      if (column != token->column)
+        addColumn(token->column);
+      file << "<span class=\"" << arr[token->type] << "\">" << token->value << "</span>";
+      column = token->column + token->value.length();
+
+      token = nextToken();
+    }
+    file << "</pre>";
   }
 
 private:

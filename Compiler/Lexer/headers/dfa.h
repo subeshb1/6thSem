@@ -23,7 +23,7 @@ class DFA
         for (unsigned int i = 0; i < length; i++)
         {
             auto alphabet = getAlphabet(str[i]);
-            if (alphabet == -1)
+            if (alphabet == -1 || current->isRejected)
                 return false;
             current = current->transitions[alphabet][0];
         }
@@ -49,7 +49,12 @@ class DFA
     {
         auto alphabet = getAlphabet(character);
         if (alphabet == -1)
-            throw "No Transition for character";
+        {
+            auto reject = new FAState();
+            reject->isRejected = true;
+            return reject;
+        }
+
         return state->transitions.at(alphabet).at(0);
     }
     static bool isRejected(FAState *s)

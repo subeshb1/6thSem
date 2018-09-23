@@ -13,6 +13,21 @@
 #include "headers/re_to_postfix.h"
 #include "headers/postfix_re_to_enfa.h"
 
+FAState *numberFSM()
+{
+  // a-> digit b-> '.'
+  auto pregex = reToPostfix("((aa*((baa*)|#))|(baa*))((c(d|e|#)aa*)|#)$");
+  auto startState = directMethod(pregex);
+  return startState.first;
+}
+FAState *stringFSM()
+{
+  // a-> "" b-> any
+  auto pregex = reToPostfix("ab*a");
+  auto startState = directMethod(pregex);
+  return startState.first;
+}
+
 bool number(std::string s)
 {
   // a-> digit b-> '.'
@@ -41,13 +56,13 @@ bool number(std::string s)
 int main(int argc, char const *argv[])
 {
 
-  // auto callback = []() {
-  //   Lexer a("dummy.cpp");
-  //   a.allTokens();
-  // };
-  int a = .1;
-  // utils::withTime(callback, "Syntax Analysis");
-  std::cout << "Number 1001:" << number("1001") << std::endl;
+  Lexer a("dummy.cpp");
+  // a.allTokens();
+  a.toHTML();
+  return 0;
+}
+
+/*  std::cout << "Number 1001:" << number("1001") << std::endl;
   std::cout << "Number 1e:" << number("1e") << std::endl;
   std::cout << "Number 1e1:" << number("1e1") << std::endl;
   std::cout << "Number 1.100:" << number("1.100") << std::endl;
@@ -56,7 +71,4 @@ int main(int argc, char const *argv[])
   std::cout << "Number .1:" << number(".1") << std::endl;
   std::cout << "Number .1e10:" << number(".1e10") << std::endl;
   std::cout << "Number .1e:" << number(".1e") << std::endl;
-  std::cout << "Number a.1:" << number("a.1") << std::endl;
-  /* code */
-  return 0;
-}
+  std::cout << "Number a.1:" << number("a.1") << std::endl;*/

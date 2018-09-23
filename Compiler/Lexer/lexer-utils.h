@@ -33,11 +33,60 @@ bool isOperator(char a)
 {
     return a == '+' || a == '-' || a == '*' || a == '/' || a == '^' || a == '%' || a == '!' || a == '&' || a == '?' || a == '|' || a == '~' || a == '>' || a == '=' || a == '<';
 }
-
+bool isStringOrChar(char a)
+{
+    return a == '\'' || a == '"';
+}
 bool isKeyWord(std::string keyWord)
 {
     return keyWords.find(keyWord) != keyWords.end();
 }
+
+FAState *numberFSM()
+{
+    // a-> digit b-> '.'
+    auto pregex = reToPostfix("((aa*((baa*)|#))|(baa*))((c(d|e|#)aa*)|#)$");
+    auto startState = directMethod(pregex);
+    return startState.first;
+}
+FAState *stringFSM()
+{
+    // a-> "" b-> any
+    auto pregex = reToPostfix("ab*a");
+    auto startState = directMethod(pregex);
+    return startState.first;
+}
+
+const auto NUMBER_FSM = numberFSM();
+const auto STRING_FSM = stringFSM();
+
+int getNumberAlphabet(int a)
+{
+    if (a >= '0' && a <= '9')
+        return 0;
+    if (a == '.')
+        return 1;
+    if (a == 'e')
+        return 2;
+    if (a == '+')
+        return 3;
+    if (a == '-')
+        return 4;
+    return -1;
+}
+int getStringAlphabet(int a)
+{
+    if (a == '\'')
+        return 0;
+    return 1;
+}
+int getCharAlphabet(int a)
+{
+    if (a == '"')
+        return 0;
+    return 1;
+}
+
 } // namespace lex
 
 #endif // LEXER_UTILS_H
