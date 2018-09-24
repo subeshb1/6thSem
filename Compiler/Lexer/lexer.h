@@ -26,25 +26,31 @@
 
 typedef enum
 {
-  IDENTIFIER,
-  NUMBER,
   KEYWORD,
-  LITERAL,
+  IDENTIFIER,
+  BOOLEAN,
+  NUMBER,
+  STRING,
+  REGEXP,
   OPERATOR,
-  EOT,
   DELIMETER,
-  UNDEF
+  COMMENT,
+  UNDEF,
+  EOT
 } TokenType;
-std::string arr[8] =
+std::string arr[11] =
     {
-        "IDENTIFIER",
-        "NUMBER",
         "KEYWORD",
-        "LITERAL",
+        "IDENTIFIER",
+        "BOOLEAN",
+        "NUMBER",
+        "STRING",
+        "REGEXP",
         "OPERATOR",
-        "EOT",
         "DELIMETER",
-        "UNDEF"};
+        "COMMENT",
+        "UNDEF",
+        "EOT"};
 
 struct Token
 {
@@ -76,7 +82,7 @@ public:
 */
   Lexer(std::string fileName)
   {
-    this->tokenCount = {0, 0, 0, 0, 0, 0, 0, 0};
+    this->tokenCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     this->position = 0;
     this->line = 1;
@@ -91,7 +97,7 @@ public:
     // std::cout << this->input;
   }
   /**
-   * summarry - returns next token in sequence pointed by line  number and column number
+   * summary - returns next token in sequence pointed by line  number and column number
    * @method
    * @return {std::shared_ptr<Token>} - A Token
   */
@@ -121,6 +127,22 @@ public:
     {
       return processDelimeter();
     }
+    else if (character == '/')
+    {
+      if ((position + 1) < input.length())
+      {
+        const auto nextChar = input.at(position + 1);
+        if (nextChar == '/')
+          return processSingleLineComment();
+        if (nextChar == '*')
+        return processMultiLineComment();
+      }
+      // if (position > 0 && !lex::isAlphabet(input.at(position)) && !lex::isDigit(input.at(position)))
+      // {
+      //   return processRegExp();
+      // }
+      // return processOperator();
+    }
     else if (lex::isOperator(character))
     {
       return processOperator();
@@ -133,7 +155,66 @@ public:
   }
 
   /**
-   * summarry - returns an identifier or a keyword using lookahead
+   * summary - returns single line comment
+   * @method
+   * @return {std::shared_ptr<Token>} - A Token
+  */
+  std::shared_ptr<Token> processSingleLineComment()
+  {
+    std::string comment = "";
+    auto startColumn = column;
+    char character = input.at(position);
+    while (character != '\n')
+    {
+      comment += character;
+
+      if (++position >= input.length())
+        break;
+      character = input.at(position);
+    }
+    position++;
+    column = 1;
+    line += 1;
+    tokenCount[COMMENT]++;
+    return std::make_shared<Token>(COMMENT, comment, line - 1, startColumn);
+  }
+  /**
+   * summary - returns multi line comment
+   * @method
+   * @return {std::shared_ptr<Token>} - A Token
+  */
+  std::shared_ptr<Token> processMultiLineComment()
+  {
+    std::string comment = "";
+    auto startColumn = column;
+    auto startLine = line;
+    char character;
+    auto currentState = lex::MULTILINE_FSM;
+    do
+    {
+      character = input.at(position);
+      // std::cout << character;
+      if (character == '\n')
+      {
+        line++;
+        column = 1;
+      }
+      comment += character;
+      column++;
+
+      if (++position >= input.length())
+        break;
+
+      currentState = DFA::next(currentState, lex::getMultiLineAlphabet, character);
+    
+    } while (!currentState->isFinal);
+
+    tokenCount[COMMENT]++;
+    return std::make_shared<Token>(COMMENT, comment, startLine, startColumn);
+  }
+
+  /**
+   * summary - returns an identifier or a keyword using lookahead
    * @method
    * @return {Token}
   */
@@ -173,7 +254,7 @@ public:
   }
 
   /**
-   * summarry - returns Delimeter tokens
+   * summary - returns Delimeter tokens
    * @method processDelimeter
    * @return {Token}
   */
@@ -185,7 +266,7 @@ public:
     return std::make_shared<Token>(DELIMETER, delim, line, column++);
   }
   /**
-   * summarry - returns Operators token
+   * summary - returns Operators token
    * @method processOperator
    * @return {Token}
   */
@@ -198,7 +279,7 @@ public:
   }
 
   /**
-   * summarry - returns Number Token 
+   * summary - returns Number Token 
    * @method processDigit
    * @return {Token}
   */
@@ -232,11 +313,11 @@ public:
 
     this->position = lookAhead + 1;
     this->column += literal.length();
-    tokenCount[LITERAL]++;
-    return std::make_shared<Token>(LITERAL, literal, line, column);
+    tokenCount[STRING]++;
+    return std::make_shared<Token>(STRING, literal, line, column);
   }
   /**
-   * summarry - returns Number Token 
+   * summary - returns Number Token 
    * @method processDigit
    * @return {Token}
   */
@@ -271,7 +352,7 @@ public:
   }
 
   /**
-   * summarry - Skips all white space incrementing column and line count
+   * summary - Skips all white space incrementing column and line count
    * @method
   */
   void skipWhiteSpace()
@@ -297,7 +378,7 @@ public:
     }
   }
   /**
-   * summarry - Prints out all the token
+   * summary - Prints out all the token
    * @method
   */
   void allTokens()
@@ -330,15 +411,19 @@ public:
 
   void toHTML()
   {
-    std::ofstream file("output.txt");
-    file << "<pre>";
+    std::ofstream file("output.html");
+    file << " <div class=\"snippet\"> <style scoped> * { margin: 0; padding: 0; box-sizing: border-box; font-family: monospace; } .KEYWORD { color: #45a1ce; } .IDENTIFIER { color: black; } .NUMBER { color: purple; } .OPERATOR { color: #eaaf00; } .DELIMETER { color: #0004b7; } .STRING { color: green; } .COMMENT { color: #5050ff; font-style: italic; } .UNDEF { text-decoration: underline; color: red; } .snippet { background: white; padding: 10px; display: flex; align-items: stretch; overflow: auto; } .snippet .line div::after { content: \".\" } .snippet .line { padding-right: 10px; height: 100%; border-right: 2px solid red; user-select: none; } pre { padding-left: 1em; } </style><div class=\"line\"> <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> <div>10</div> <div>11</div> <div>12</div> </div><pre>";
     auto token = nextToken();
     int line = 1;
     int column = 1;
 
-    auto addLine = [&]() mutable {
-      file << '\n';
-      line++;
+    auto addLine = [&](int l) mutable {
+      const auto diff = l - line;
+      for (int i = 0; i < diff; i++)
+      {
+        file << "\n";
+      }
+      line = l;
       column = 1;
     };
     auto addColumn = [&](int col) mutable {
@@ -362,7 +447,7 @@ public:
       case KEYWORD:
         color = "blue";
         break;
-      case LITERAL:
+      case STRING:
         color = "green";
         break;
       case OPERATOR:
@@ -373,7 +458,7 @@ public:
         break;
       }
       if (line != token->line)
-        addLine();
+        addLine(token->line);
       if (column != token->column)
         addColumn(token->column);
       file << "<span class=\"" << arr[token->type] << "\">" << token->value << "</span>";
@@ -381,7 +466,9 @@ public:
 
       token = nextToken();
     }
-    file << "</pre>";
+    file << "</pre></div>";
+    file.close();
+    
   }
 
 private:
