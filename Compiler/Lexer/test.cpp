@@ -12,23 +12,36 @@
 #include <set>
 #include "headers/re_to_postfix.h"
 #include "headers/postfix_re_to_enfa.h"
+#include <cstring>
+#include <string>
 #include <emscripten/emscripten.h>
 extern "C"
 {
-  const char *EMSCRIPTEN_KEEPALIVE callMePlease(const char *name)
+  char *EMSCRIPTEN_KEEPALIVE callMePlease(const char *name)
   {
-   
 
     Lexer a;
     fflush(stdin);
     a.setInput(name);
-    fflush(stdin);
     const std::string data = a.toString();
-    fflush(stdin);
+    char *str = new char[data.length() + 1];
+    // const
     // std::cout << data << std::endl;
-    return data.c_str();
+    std::strcpy(str, data.c_str());
+    return str;
   }
 }
+// const char *callMePlease(const char *name)
+// {
+
+//   Lexer a;
+//   fflush(stdin);
+//   a.setInput(name);
+//   fflush(stdin);
+//   const std::string data = a.toString();
+//   std::cout << data << std::endl;
+//   return data.c_str();
+// }
 int main(int argc, char const *argv[])
 {
 
@@ -37,7 +50,7 @@ int main(int argc, char const *argv[])
   // a.allTokens();
   // Lexer b("dummy.js");
   // b.toHTML();
-  callMePlease("FIRST CALL");
+  std::cout << callMePlease("FIRST asdaskldh asdn klasjdk ajslkd jalksdj lkasjd lkasjdk jakls ");
   // a.toHTML();
   return 0;
 }
