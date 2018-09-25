@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="code">
+
+    </div>
+    <textarea name="text" id="text" cols="30" rows="10">
+        function percentage(num, per)
+        {
+            return (num/100)*per;
+        }
+          
+        console.log(percentage(1000, 47.12));
+    </textarea>
+    <script src="index.js"></script>
+    <script>
+        function highlightCode(str) {
+            let ptr = allocateUTF8(str);
+            // Call the method passing the pointer
+            let retPtr = _callMePlease(ptr);
+            // Retransform back your pointer to string using 'Glue' method
+            let resValue = Pointer_stringify(retPtr);
+            // Free the memory allocated by 'allocate' 
+            _free(ptr);
+            // console.log(resValue)
+            document.getElementById('code').innerHTML = resValue;
+        }
+
+        window.onload = () => {
+            document.getElementById('text').oninput = (e) => {
+                highlightCode(e.target.value);
+            }
+        }
+    </script>
+</body>
+
+</html>

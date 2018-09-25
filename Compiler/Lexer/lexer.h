@@ -78,6 +78,18 @@ class Lexer
 public:
   /**
  * @constructor
+ * 
+*/
+  Lexer()
+  {
+    this->tokenCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    this->position = 0;
+    this->line = 1;
+    this->column = 1;
+  }
+
+  /**
+ * @constructor
  * @params {string} file = file name
 */
   Lexer(std::string fileName)
@@ -95,6 +107,16 @@ public:
     buffer << file.rdbuf();
     this->input = buffer.str();
     // std::cout << this->input;
+  }
+
+  /**
+   * summary - sets input
+   * @method
+   * @setter
+  */
+  void setInput(std::string input)
+  {
+    this->input = input;
   }
   /**
    * summary - returns next token in sequence pointed by line  number and column number
@@ -135,7 +157,7 @@ public:
         if (nextChar == '/')
           return processSingleLineComment();
         if (nextChar == '*')
-        return processMultiLineComment();
+          return processMultiLineComment();
       }
       // if (position > 0 && !lex::isAlphabet(input.at(position)) && !lex::isDigit(input.at(position)))
       // {
@@ -206,7 +228,7 @@ public:
         break;
 
       currentState = DFA::next(currentState, lex::getMultiLineAlphabet, character);
-    
+
     } while (!currentState->isFinal);
 
     tokenCount[COMMENT]++;
@@ -220,6 +242,7 @@ public:
   */
   std::shared_ptr<Token> processAlphabet()
   {
+
     //look ahead buffer
     long lookAhead = position;
     //the column pointing identifier start
@@ -227,9 +250,8 @@ public:
 
     //Containing the word
     std::string word = "";
-    word += input.at(lookAhead);
 
-    char nextChar = input.at(++lookAhead);
+    char nextChar = input.at(lookAhead);
 
     // Looking ahead until valid characters
     while (lex::isAlphabet(nextChar) || lex::isDigit(nextChar))
@@ -258,7 +280,8 @@ public:
    * @method processDelimeter
    * @return {Token}
   */
-  std::shared_ptr<Token> processDelimeter()
+  std::shared_ptr<Token>
+  processDelimeter()
   {
     std::string delim = "";
     delim += input.at(position++);
@@ -435,28 +458,7 @@ public:
     };
     while (token->type != EOT)
     {
-      std::string color = "black";
-      switch (token->type)
-      {
-      case IDENTIFIER:
-        color = "red";
-        break;
-      case NUMBER:
-        color = "purple";
-        break;
-      case KEYWORD:
-        color = "blue";
-        break;
-      case STRING:
-        color = "green";
-        break;
-      case OPERATOR:
-        color = "yellow";
-        break;
-      case DELIMETER:
-        color = "skyblue";
-        break;
-      }
+
       if (line != token->line)
         addLine(token->line);
       if (column != token->column)
@@ -468,7 +470,47 @@ public:
     }
     file << "</pre></div>";
     file.close();
-    
+  }
+
+  std::string toString()
+  {
+    std::stringstream file;
+    file << " <div class=\"snippet\"> <style scoped> * { margin: 0; padding: 0; box-sizing: border-box; font-family: monospace; } .KEYWORD { color: #45a1ce; } .IDENTIFIER { color: black; } .NUMBER { color: purple; } .OPERATOR { color: #eaaf00; } .DELIMETER { color: #0004b7; } .STRING { color: green; } .COMMENT { color: #5050ff; font-style: italic; } .UNDEF { text-decoration: underline; color: red; } .snippet { background: white; padding: 10px; display: flex; align-items: stretch; overflow: auto; } .snippet .line div::after { content: \".\" } .snippet .line { padding-right: 10px; height: 100%; border-right: 2px solid red; user-select: none; } pre { padding-left: 1em; } </style><div class=\"line\"> <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> <div>10</div> <div>11</div> <div>12</div> </div><pre>";
+    auto token = nextToken();
+    int line = 1;
+    int column = 1;
+
+    auto addLine = [&](int l) mutable {
+      const auto diff = l - line;
+      for (int i = 0; i < diff; i++)
+      {
+        file << "\n";
+      }
+      line = l;
+      column = 1;
+    };
+    auto addColumn = [&](int col) mutable {
+      const auto diff = col - column;
+      for (int i = 0; i < diff; i++)
+      {
+        file << " ";
+      }
+    };
+    while (token->type != EOT)
+    {
+
+      if (line != token->line)
+        addLine(token->line);
+      if (column != token->column)
+        addColumn(token->column);
+      file << "<span class=\"" << arr[token->type] << "\">" << token->value << "</span>";
+      column = token->column + token->value.length();
+
+      token = nextToken();
+    }
+    file << "</pre></div>";
+    std::string data = file.str();
+    return data;
   }
 
 private:

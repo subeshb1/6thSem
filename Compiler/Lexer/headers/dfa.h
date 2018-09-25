@@ -30,20 +30,20 @@ class DFA
 
         return current->isFinal;
     }
-    bool test(std::string str, auto getAlphabet)
-    {
-        auto current = this->start;
-        auto length = str.length();
-        for (unsigned int i = 0; i < length; i++)
-        {
-            auto alphabet = getAlphabet(str[i]);
-            if (alphabet == -1)
-                return false;
-            current = current->transitions[alphabet][0];
-        }
+    // bool test(std::string str, auto getAlphabet)
+    // {
+    //     auto current = this->start;
+    //     auto length = str.length();
+    //     for (unsigned int i = 0; i < length; i++)
+    //     {
+    //         auto alphabet = getAlphabet(str[i]);
+    //         if (alphabet == -1)
+    //             return false;
+    //         current = current->transitions[alphabet][0];
+    //     }
 
-        return current->isFinal;
-    }
+    //     return current->isFinal;
+    // }
 
     static FAState *next(FAState *state, int (*getAlphabet)(int), char character)
     {
